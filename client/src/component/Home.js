@@ -8,9 +8,8 @@ const Home = ({ consentInfo }) => {
       <div className="jumbotron">
         <h1 className="display-4">Consent Managment System </h1>
 
-        <p className="lead">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p>
-          <p>It uses utility classes for typography and spacing to space content out within the larger container.</p>
-          <a className="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
+        <p className="lead">This is a simple DAPP decentralized application to manag consent with many stackholder including Patient.</p>
+          <a className="btn btn-primary btn-lg" href="/" role="button">Learn more</a>
 </div>
 
         <ul className="list-group w-50 mt-5 position-relative list-group-flush">

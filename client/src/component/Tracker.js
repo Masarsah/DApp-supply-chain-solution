@@ -1,103 +1,53 @@
-// import React, { Component } from "react";
-// import Input from "./Input";
-// import Practitioner from "./Practitioner";
-// import Patient from "./Patient";
-// import Hospital from "./component/Hospital";
-// import Tracker from "./Tracker";
-// import NavBar from "./NavBar";
-// import Home from "./Home";
+import React from "react";
 
-// class Tracker extends Component {
-//   constructor() {
-//     super();
-//     this.state = {
-//         web3Provider: null,
-//         contracts: {},
-//         emptyAddress: "0x0000000000000000000000000000000000000000",
-//         sku: 0,
-//         name:"",
-//         metamaskAccountID: "0x0000000000000000000000000000000000000000",
-//         currentOwner: "0x0000000000000000000000000000000000000000",
-//         hospital: "0x0000000000000000000000000000000000000000",
-//         hospitalName: null,
-//         consentInfo: null,
-//         ICD10: null,
-//         PTconsentState: null,
-//         symptom: 0,
-//         practitioner: "0x0000000000000000000000000000000000000000",
-//         practitionerName: null,
-//         patient: "0x0000000000000000000000000000000000000000",
-//         patientName: null,
-//         patientID: null,
-//         patientCondtion: null
-//     };
-//   }
 
-//   handleRequest(user) {
-//     let apiUrl = "http://localhost:3000/rapi";
+const Tracker = ({ consentState }) => {
+  console.log(consentState)
+  return (
+    <div className="">
+      <div className="jumbotron">
+        <h1 className="display-4">Consent Tracker System </h1>
 
-//     apiUrl += this.props.form === "signup" ? "/users" : "/auth";
-//     console.log(apiUrl);
-//     console.log(user);
 
-//     fetch(apiUrl, {
-//       method: "POST",
-//       headers: {
-//         "Content-Type": "application/json"
-//       },
-//       body: JSON.stringify(user)
-//     })
-//       .then(response => response.json())
-//       .then(data => {
-//         console.log(data);
-//         setJwt(data.token);
-//         this.props.onLogin();
-//       })
-//       .catch(error => {
-//         console.log(error);
-//       });
-//   }
-//   handleSubmit = e => {
-//     e.preventDefault();
-//     this.handleRequest(this.state.data);
-//   };
-//   handleChange = ({ currentTarget: input }) => {
-//     const data = { ...this.state.data };
-//     data[input.name] = input.value;
-//     this.setState({ data });
-//   };
+</div>
+<table className="table">
+  <thead className="thead-dark">
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Approved</th>
+      <th scope="col">Requested</th>
+      <th scope="col">Practitioner Signed</th>
+      <th scope="col">Patient Signed </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">1</th>
+      <td>Mark</td>
+      <td>Otto</td>
+      <td>@mdo</td>
+      <td>@mdo</td>
+    </tr>
+    <tr>
+      <th scope="row">2</th>
+      <td>Jacob</td>
+      <td>Thornton</td>
+      <td>@fat</td>
+      <td>@fat</td>
+    </tr>
+    <tr>
+      <th scope="row">3</th>
+      <td>Larry</td>
+      <td>the Bird</td>
+      <td>@twitter</td>
+      <td>@twitter</td>
+    </tr>
+  </tbody>
+</table>
 
-//   renderInput = (name, lable, type = "text") => {
-//     const { data } = this.state;
-//     // const data = this.state.data
 
-//     return (
-//       <Input
-//         name={name}
-//         lable={lable}
-//         type={type}
-//         value={data[name]}
-//         onChange={this.handleChange}
-//       />
-//     );
-//   };
-//   render() {
-//     return (
-//       <div>
-//         {this.props.form === "signup" ? (
-//           <Signup
-//             renderInput={this.renderInput}
-//             handleSubmit={this.handleSubmit}
-//           />
-//         ) : (
-//           <Login
-//             renderInput={this.renderInput}
-//             handleSubmit={this.handleSubmit}
-//           />
-//         )}
-//       </div>
-//     );
-//   }
-// }
-
-// export default Tracker;
+      </div>
+      );
+    };
+    
+export default Tracker;

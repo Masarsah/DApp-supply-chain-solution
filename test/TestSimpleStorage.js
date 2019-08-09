@@ -44,7 +44,8 @@ contract('SupplyChain', function (accounts) {
             hospitalName,
             consentInfo,
             ICD10,
-            symptom)
+            symptom
+            )
 
 
 

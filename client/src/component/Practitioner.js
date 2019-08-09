@@ -9,7 +9,7 @@ const Practitionereq = ({ renderInput, handleSubmit  }) => {
     <form onSubmit={handleSubmit}>
     {renderInput("sku", "Consent ID")}
 
-      <button className="btn btn-info"> Signup Consent </button>
+      <button className="btn btn-info" > Signup Consent </button>
     </form>
   </div>
     );

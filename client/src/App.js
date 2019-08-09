@@ -25,20 +25,19 @@ class App extends Component {
       data: {
         sku: 0,
         name: "",
-        metamaskAccountID: "0x0000000000000000000000000000000000000000",
         currentOwner: "0x0000000000000000000000000000000000000000",
         hospital: "0x0000000000000000000000000000000000000000",
-        hospitalName: null,
-        consentInfo: null,
-        ICD10: null,
-        PTconsentState: null,
+        hospitalName: '',
+        consentInfo: '',
+        ICD10: '',
+        PTconsentState: '',
         symptom: 0,
         practitioner: "0x0000000000000000000000000000000000000000",
-        practitionerName: null,
+        practitionerName: '',
         patient: "0x0000000000000000000000000000000000000000",
-        patientName: null,
-        patientID: null,
-        patientCondtion: null
+        patientName: '',
+        patientID: 0,
+        patientCondtion: ''
       }
     };
   }
@@ -71,6 +70,252 @@ class App extends Component {
       console.error(error);
     }
   };
+
+  getState = (stateID) => {
+    switch (stateID) {
+      case '0':
+        return 'Approved'
+      case '1':
+        return 'Requested'
+      case '2':
+        return 'Signed'
+      case '3':
+        return 'PtSigned'
+    }
+  }
+
+  handleButtonClick = async (e) => {
+    e.preDefault()
+    const web3 = await getWeb3();
+
+
+    await web3.eth.getAccounts()
+
+    var processId = parseInt((e.target).data('id'))
+
+    switch (processId) {
+      case 1:
+        return await this.approvedHospital(e)
+        break
+      case 2:
+        return await this.requestedConsent(e)
+        break
+      case 3:
+        return await this.Signedconsent(e)
+        break
+      case 4:
+        return await this.PtSigned(e)
+        break
+      case 5:
+        return await this.fetchPTconsentBufferOne(e)
+        break
+      case 6:
+        return await this.fetchPTconsentBufferTwo(e)
+        break
+      case 7:
+        return await this.addHospital(e)
+        break
+      case 8:
+        return await this.addPractitioner(e)
+        break
+      case 9:
+        return await this.addPatient(e)
+        break
+    }
+  }
+
+  approvedHospital = (e) => {
+    e.preventDefault()
+    this.state.symptom = this.state.web3.toWei(('#sellingPrice').val(), 'ether')
+
+    this.state.contracts.SupplyChain.deployed()
+      .then(function (instance) {
+        return instance.approvedHospital(
+          this.state.sku,
+          this.state.name,
+          this.state.hospital,
+          this.state.hospitalName,
+          this.state.consentInfo,
+          this.state.ICD10
+        )
+      })
+      .then(function (result) {
+        ('#ftc-hospital-consent').text(result.logs[0].transactionHash)
+      })
+      .catch(function (err) {
+        console.log(err.message)
+      })
+  }
+
+  requestedConsent = (e) => {
+    e.preventDefault()
+
+    var processId = parseInt((e.target).data('id'))
+     this.state.sku = ('#sku-hospital').val()
+    const consentPrice = this.state.data.symptom
+    this.state.contracts.SupplyChain.deployed()
+      .then(function (instance) {
+        const walletValue = this.state.web3.toWei(consentPrice, 'ether')
+        return instance.requestedConsent(
+          this.state.sku,
+          this.state.practitioner,
+          this.state.practitionerName,
+          this.state.patientCondtion,
+          {
+            from: this.state.hospital,
+            value: walletValue
+          })
+      })
+      .then(function (result) {
+        ('#ftc-hospital-consent').text(result.logs[0].transactionHash)
+      })
+      .catch(function (err) {
+        console.log(err.message)
+      })
+  }
+
+  Signedconsent = (e) => {
+    e.preventDefault()
+
+    var processId = parseInt((e.target).data('id'))
+     this.state.sku = ('#sku-product').val()
+    this.state.contracts.SupplyChain.deployed()
+      .then(function (instance) {
+        return instance.Signedconsent(
+          this.state.sku,
+          { from: this.state.practitioner })
+      })
+      .then(function (result) {
+        ('#ftc-product-consent').text(result.logs[0].transactionHash)
+      })
+      .catch(function (err) {
+        console.log(err.message)
+      })
+  }
+
+  PtSigned = (e) => {
+    e.preventDefault()
+    var processId = parseInt((e.target).data('id'))
+     this.state.sku = ('#sku-product').val()
+    this.state.contracts.SupplyChain.deployed()
+      .then(function (instance) {
+        return instance.PtSigned(
+          this.state.sku,
+          this.state.patient,
+          this.state.patientName,
+          this.state.patientID,
+          { from: this.state.practitioner })
+      })
+      .then(function (result) {
+        ('#ftc-product-consent').text(result.logs[0].transactionHash)
+      })
+      .catch(function (err) {
+        console.log(err.message)
+      })
+  }
+
+  fetchPTconsentBufferOne = () => {
+     this.state.sku = ('#sku').val()
+
+    this.state.contracts.SupplyChain.deployed()
+      .then(function (instance) {
+        return instance.fetchPTconsentBufferOne( this.state.sku)
+      })
+      .then(function (result) {
+        ('#ftc-consent').text(
+          <table className="table">
+          <thead className="thead-dark">
+            <tr>
+              <th scope="col">sku</th>
+              <th scope="col">name</th>
+              <th scope="col">hospital</th>
+              <th scope="col">hospitalName  </th>
+              <th scope="col">symptom </th>
+              <th scope="col">consentInfo </th>
+              <th scope="col">ICD10 </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">{result[0]}</th>
+            </tr>
+            <tr>
+              <th scope="row">{result[1]}</th>
+            </tr>
+            <tr>
+              <th scope="row">{result[3]}</th>
+            </tr>    <tr>
+              <th scope="row">{result[4]}</th>
+            </tr>
+            <tr>
+              <th scope="row">{result[5]}</th>
+            </tr>
+            <tr>
+              <th scope="row">{result[6]}</th>
+            </tr>    <tr>
+              <th scope="row">{result[7]}</th>
+            </tr>
+          </tbody>
+        </table>
+        )
+      })
+      .catch(function (err) {
+        console.log(err.message)
+      })
+  }
+  fetchconsentBufferTwo = () => {
+    ///    event.preventDefault();
+    ///    var processId = parseInt((event.target).data('id'));
+     this.state.sku = ('#sku').val()
+
+    this.state.contracts.SupplyChain.deployed()
+      .then(function (instance) {
+        return instance.fetchconsentBufferTwo.call( this.state.sku)
+      })
+      .then(function (result) {
+        return (
+
+          <table className="table">
+            <thead className="thead-dark">
+              <tr>
+                <th scope="col">sku</th>
+                <th scope="col">practitioner</th>
+                <th scope="col">practitionerName</th>
+                <th scope="col">Patient  </th>
+                <th scope="col">Patient Name </th>
+                <th scope="col">Patient ID </th>
+                <th scope="col">Patient Condition </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">{result[0]}</th>
+              </tr>
+              <tr>
+                <th scope="row">{result[2]}</th>
+              </tr>
+              <tr>
+                <th scope="row">{result[3]}</th>
+              </tr>    <tr>
+                <th scope="row">{result[4]}</th>
+              </tr>
+              <tr>
+                <th scope="row">{result[5]}</th>
+              </tr>
+              <tr>
+                <th scope="row">{result[6]}</th>
+              </tr>    <tr>
+                <th scope="row">{result[7]}</th>
+              </tr>
+            </tbody>
+          </table>
+        )
+
+      })
+      .catch(function (err) {
+        console.log(err.message)
+      })
+  }
 
 
 
@@ -109,18 +354,18 @@ class App extends Component {
     if (this.state.showPage === 'hospital') {
       return (
         <div className="hospital">
-          <Hospital 
-                renderInput={this.renderInput}
-                handleSubmit={this.handleSubmit}
-                />
-              </div>
+          <Hospital
+            renderInput={this.renderInput}
+            handleSubmit={this.handleSubmit}
+          />
+        </div>
       )
     } else if (this.state.showPage === 'practitionereq') {
       return (
         <div>
           <Practitionereq
-                renderInput={this.renderInput}
-                handleSubmit={this.handleSubmit}
+            renderInput={this.renderInput}
+            handleSubmit={this.handleSubmit}
           />
         </div>
       )
@@ -132,13 +377,15 @@ class App extends Component {
             handleSubmit={this.handleSubmit}
           />
         </div>
-        
+
       )
 
     } else if (this.state.showPage === 'tracker') {
       return (
         <div>
-          <Tracker />
+          <Tracker
+            consentState={this.state.data}
+          />
         </div>
       )
 
@@ -152,25 +399,13 @@ class App extends Component {
       return (
         <div>
           <Practitioner
-                renderInput={this.renderInput}
-                handleSubmit={this.handleSubmit}
+            renderInput={this.renderInput}
+            handleSubmit={this.handleSubmit}
           />
         </div>
       )
     }
   }
-  // runExample = async () => {
-  //   const { accounts, contract } = this.state;
-
-  //   // Stores a given value, 5 by default.
-  //   await contract.methods.set(5).send({ from: accounts[0] });
-
-  //   // Get the value from the contract to prove it worked.
-  //   const response = await contract.methods.get().call();
-
-  //   // Update state with the result.
-  //   this.setState({ storageValue: response });
-  // };
 
   render() {
     return (
@@ -187,3 +422,4 @@ class App extends Component {
 }
 
 export default App;
+

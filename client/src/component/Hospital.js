@@ -1,6 +1,6 @@
 import React  from "react";
 
-const Hospital = ({ renderInput, handleSubmit  }) => {
+const Hospital = ({ renderInput, handleSubmit , changeCurrentOwner }) => {
     return (
         <div className="form">
         <div className="jumbotron text-center">
@@ -9,13 +9,13 @@ const Hospital = ({ renderInput, handleSubmit  }) => {
     <form onSubmit={handleSubmit}>
     {renderInput("sku", "Consent ID")}
     {renderInput("name", "Consent Name")}
-      {renderInput("hospital", "Hospital address")}
+    {renderInput("hospital", "Hospital address")}
       {renderInput("hospitalName","Hospital Name")}
       {renderInput("consentInfo", "Consent Info")}
       {renderInput("ICD10", "ICD10")}
       {renderInput("symptom", "symptom")}
 
-      <button className="btn btn-info"> Signup Consent </button>
+      <button className="btn btn-info" onClick={() => { changeCurrentOwner("hospital") }}> Signup Consent </button>
     </form>
   </div>
     );
