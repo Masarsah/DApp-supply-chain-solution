@@ -1,11 +1,16 @@
 import React, { Component } from "react";
 import getWeb3 from "./utils/getWeb3";
-import Practitioner from "./component/Practitioner";
-import Patient from "./component/Patient";
-import Hospital from "./component/Hospital";
+import SupplyChain from "./contracts/SupplyChain.json";
 import Tracker from "./component/Tracker";
 import NavBar from "./component/NavBar";
 import Home from "./component/Home";
+import Patient from "./component/Patient";
+import Practitionereq from "./component/Practitionereq";
+import Practitioner from "./component/Practitioner";
+import Hospital from "./component/Hospital";
+import Input from "./component/Input";
+
+
 
 import "./App.css";
 
@@ -13,73 +18,146 @@ class App extends Component {
   constructor() {
     super();
     this.state = {
-      showPage: "home"
+      showPage: "home",
+      web3Provider: null,
+      contracts: {},
+      emptyAddress: "0x0000000000000000000000000000000000000000",
+      data: {
+        sku: 0,
+        name: "",
+        metamaskAccountID: "0x0000000000000000000000000000000000000000",
+        currentOwner: "0x0000000000000000000000000000000000000000",
+        hospital: "0x0000000000000000000000000000000000000000",
+        hospitalName: null,
+        consentInfo: null,
+        ICD10: null,
+        PTconsentState: null,
+        symptom: 0,
+        practitioner: "0x0000000000000000000000000000000000000000",
+        practitionerName: null,
+        patient: "0x0000000000000000000000000000000000000000",
+        patientName: null,
+        patientID: null,
+        patientCondtion: null
+      }
     };
   }
 
 
-  // componentDidMount = async () => {
-  //   try {
-  //     // Get network provider and web3 instance.
-  //     const web3 = await getWeb3();
+  componentDidMount = async () => {
+    try {
+      // Get network provider and web3 instance.
+      const web3 = await getWeb3();
 
-  //     // Use web3 to get the user's accounts.
-  //     const accounts = await web3.eth.getAccounts();
+      // Use web3 to get the user's accounts.
+      const accounts = await web3.eth.getAccounts();
 
-  //     // Get the contract instance.
-  //     const networkId = await web3.eth.net.getId();
-  //     const deployedNetwork = SimpleStorageContract.networks[networkId];
-  //     const instance = new web3.eth.Contract(
-  //       SimpleStorageContract.abi,
-  //       deployedNetwork && deployedNetwork.address,
-  //     );
+      // Get the contract instance.
+      const networkId = await web3.eth.net.getId();
+      const deployedNetwork = SupplyChain.networks[networkId];
+      const instance = new web3.eth.Contract(
+        SupplyChain.abi,
+        deployedNetwork && deployedNetwork.address,
+      );
 
-  //     // Set web3, accounts, and contract to the state, and then proceed with an
-  //     // example of interacting with the contract's methods.
-  //     this.setState({ web3, accounts, contract: instance }, this.runExample);
-  //   } catch (error) {
-  //     // Catch any errors for any of the above operations.
-  //     alert(
-  //       `Failed to load web3, accounts, or contract. Check console for details.`,
-  //     );
-  //     console.error(error);
-  //   }
-  // };
+      // Set web3, accounts, and contract to the state, and then proceed with an
+      // example of interacting with the contract's methods.
+      this.setState({ web3, accounts, contract: instance }, this.runExample);
+    } catch (error) {
+      // Catch any errors for any of the above operations.
+      alert(
+        `Failed to load web3, accounts, or contract. Check console for details.`,
+      );
+      console.error(error);
+    }
+  };
+
+
 
   changeShowPage = (showPage) => {
 
     console.log("\n\n\n\n &&&&&&&&& \n\n\n your are in ", showPage)
     this.setState({ showPage })
   }
+
+
+  handleSubmit = e => {
+    e.preventDefault();
+  };
+  handleChange = ({ currentTarget: input }) => {
+    const data = { ...this.state.data };
+    data[input.name] = input.value;
+    this.setState({ data });
+  };
+
+  renderInput = (name, lable, type = "text") => {
+    const { data } = this.state;
+    // const data = this.state.data
+
+    return (
+      <Input
+        name={name}
+        lable={lable}
+        type={type}
+        value={data[name]}
+        onChange={this.handleChange}
+      />
+    );
+  };
+
   renderShow() {
-    if (this.state.showPage === 'Hospital') {
+    if (this.state.showPage === 'hospital') {
       return (
         <div className="hospital">
-          <Hospital />
-          ]      </div>
+          <Hospital 
+                renderInput={this.renderInput}
+                handleSubmit={this.handleSubmit}
+                />
+              </div>
       )
-    } else if (this.state.showPage === 'Practitioner') {
+    } else if (this.state.showPage === 'practitionereq') {
       return (
         <div>
-          <Practitioner />
+          <Practitionereq
+                renderInput={this.renderInput}
+                handleSubmit={this.handleSubmit}
+          />
         </div>
       )
-    } else if (this.state.showPage === 'Patient') {
+    } else if (this.state.showPage === 'patient') {
       return (
         <div>
-          <Patient />
+          <Patient
+            renderInput={this.renderInput}
+            handleSubmit={this.handleSubmit}
+          />
         </div>
+        
       )
 
-    }else if (this.state.showPage === 'Patient') {
+    } else if (this.state.showPage === 'tracker') {
       return (
         <div>
           <Tracker />
         </div>
       )
 
+    } else if (this.state.showPage === 'home') {
+      return (
+        <div>
+          <Home consentInfo={this.state.data} />
+        </div>
+      )
+    } else if (this.state.showPage === 'practitioner') {
+      return (
+        <div>
+          <Practitioner
+                renderInput={this.renderInput}
+                handleSubmit={this.handleSubmit}
+          />
+        </div>
+      )
     }
-
   }
   // runExample = async () => {
   //   const { accounts, contract } = this.state;
@@ -95,17 +173,14 @@ class App extends Component {
   // };
 
   render() {
-    if (!this.state.web3) {
-      return <div>Loading Web3, accounts, and contract...</div>;
-    }
     return (
       <div className="App">
         <NavBar
           changeActivePage={this.changeShowPage}
         />
-        <div className="home">
-          {this.state ? this.renderShow() : <Home />}
-        </div>
+
+        {this.renderShow()}
+
       </div>
     );
   }
